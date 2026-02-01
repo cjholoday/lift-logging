@@ -1,0 +1,15 @@
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Bytecode
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+
+# OS junk
+.DS_Store

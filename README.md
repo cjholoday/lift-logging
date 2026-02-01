@@ -1,3 +1,1 @@
 # exercise-log-parser
-
-TODO

@@ -10,6 +10,18 @@ def extract_date_prefix(line: str) -> str | None:
         return None
     return m.group(1)
 
+class ParseError(Exception):
+    """Base class for all parser errors."""
+    def __init__(self, message: str, line: str | None = None, line_no: int | None = None):
+        super().__init__(message)
+        self.line_no = line_no
+        self.line = line
+
+    def __str__(self):
+        loc = f" (line {self.line_no})" if self.line_no is not None else ""
+        content = f"\n>> {self.line}" if self.line is not None else ""
+        return f"{self.args[0]}{loc}{content}"
+
 class Parser:
     def __init__(self):
         self._state_handlers = {
@@ -21,7 +33,11 @@ class Parser:
         state = 'start'
         workouts = []
         for idx, line in enumerate(lines):
-            state = self._state_handlers[state](line, workouts)
+            try:
+                state = self._state_handlers[state](line, workouts)
+            except ParseError as e:
+                e.line_no = idx
+                raise e
 
         return workouts
     
@@ -35,21 +51,21 @@ class Parser:
             workouts.append(new_workout)
             return 'inworkout'
 
-        # CHTODO handle parse error
+        raise ParseError("Expected a date, comment, or whitespace", line, None)
         return 'start'
 
     def handle_state_inworkout(self, line, workouts) -> str:
         if not workouts:
-            pass # CHTODO parse error
+            raise ParseError("No workouts but in state inworkout", line, None)
 
         curr_workout = workouts[-1]
         if self.is_comment_or_empty(line):
             return 'inworkout'
-                
+
         date = extract_date_prefix(line)
         if date is not None:
             if not curr_workout.entries:
-                pass # parse error
+                raise ParseError("No workout entries for previous date", line, None)
             new_workout = exercise_log_parser.workout.Workout(date, [])
             workouts.append(new_workout)
             return 'inworkout'
@@ -57,11 +73,13 @@ class Parser:
         # We expect a workout entry since there isn't a comment, whitespace, or date line
         parts = line.strip().split('...', 1)
         if not parts:
-            pass # parse error
-        if len(parts) < 2:
-            pass # parse error
-
+            raise ParseError("This should be unreachable", line, None)
+        if len(parts) < 2 or not parts[1]:
+            raise ParseError("Expected sets and reps data to follow exercise code", line, None)
+        
         exercise_code, set_and_reps_data = parts
+        exercise_code = exercise_code.strip()
+        set_and_reps_data = set_and_reps_data.strip()
 
         code_reader = exercise_log_parser.exercise_code_parser.ExerciseCodeParser()
         normalized_exercise_code = code_reader.normalize(exercise_code)

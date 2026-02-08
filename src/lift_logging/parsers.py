@@ -24,14 +24,19 @@ class ParseError(Exception):
 
 class ExerciseCodeParser:
     def normalize(self, exercise_code: str) -> str:
-        # throws if invalid
-        exercise_code = exercise_code.strip()
-        self.validate(exercise_code)
-        return exercise_code # CHTODO
+        uppers, lowers, symbols = self.unpack(exercise_code)
+        lowers = "".join(sorted(lowers))
+        symbols = "".join(sorted(symbols))
+        return uppers + lowers + symbols
 
-
-    def validate(self, exercise_code: str):
-        pass # CHTODO
+    def unpack(self, exercise_code: str) -> tuple[str, str, str]:
+        EXERCISE_CODE_RE = re.compile(
+    r"^(?P<upper>[A-Z]+)(?P<lower>[a-z]+)(?P<symbols>[^A-Za-z0-9]*)$")
+        m = EXERCISE_CODE_RE.fullmatch(exercise_code)
+        if not m:
+            raise ParseError(
+                "Exercise code does not match expected format. Expected format: EEEvvv$$$ where EEE is the exercise being done in uppercase, vvv is the variation done in lowercase, and $$$ are optional symbols further distinguishing variation", None, None)
+        return m.group("upper"), m.group("lower"), m.group("symbols")
 
 class ExerciseLogParser:
     def __init__(self):
@@ -92,8 +97,12 @@ class ExerciseLogParser:
         exercise_code = exercise_code.strip()
         set_and_reps_data = set_and_reps_data.strip()
 
-        code_reader = ExerciseCodeParser()
-        normalized_exercise_code = code_reader.normalize(exercise_code)
+        try:
+            code_parser = ExerciseCodeParser()
+            normalized_exercise_code = code_parser.normalize(exercise_code)
+        except ParseError as e:
+            e.line = line
+            raise e
 
         curr_workout.entries.append(models.WorkoutEntry(
             exercise_code,

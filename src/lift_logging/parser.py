@@ -1,5 +1,5 @@
-import exercise_log_parser.workout
-import exercise_log_parser.exercise_code_parser
+import lift_logging.workout
+import lift_logging.exercise_code_parser
 import re
 
 DATE_PREFIX_RE = re.compile(r"^\s*(\d{1,2}/\d{1,2}/\d{2,4})")
@@ -47,7 +47,7 @@ class Parser:
         
         date = extract_date_prefix(line)
         if date is not None:
-            new_workout = exercise_log_parser.workout.Workout(date, [])
+            new_workout = lift_logging.workout.Workout(date, [])
             workouts.append(new_workout)
             return 'inworkout'
 
@@ -66,7 +66,7 @@ class Parser:
         if date is not None:
             if not curr_workout.entries:
                 raise ParseError("No workout entries for previous date", line, None)
-            new_workout = exercise_log_parser.workout.Workout(date, [])
+            new_workout = lift_logging.workout.Workout(date, [])
             workouts.append(new_workout)
             return 'inworkout'
         
@@ -81,10 +81,10 @@ class Parser:
         exercise_code = exercise_code.strip()
         set_and_reps_data = set_and_reps_data.strip()
 
-        code_reader = exercise_log_parser.exercise_code_parser.ExerciseCodeParser()
+        code_reader = lift_logging.exercise_code_parser.ExerciseCodeParser()
         normalized_exercise_code = code_reader.normalize(exercise_code)
 
-        curr_workout.entries.append(exercise_log_parser.workout_entry.WorkoutEntry(
+        curr_workout.entries.append(lift_logging.workout_entry.WorkoutEntry(
             exercise_code,
             normalized_exercise_code,
             set_and_reps_data

@@ -1,5 +1,5 @@
 [project]
-name = "workout-log-parser"
+name = "lift-logging"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = []

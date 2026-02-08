@@ -1,4 +1,4 @@
-import exercise_log_parser.workout_entry
+import lift_logging.workout_entry
 from dataclasses import dataclass
 
 @dataclass

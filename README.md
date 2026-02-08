@@ -1,1 +1,1 @@
-# exercise-log-parser
+# Lift Logging

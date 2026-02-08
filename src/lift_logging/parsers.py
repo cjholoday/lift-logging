@@ -1,5 +1,4 @@
-import lift_logging.workout
-import lift_logging.exercise_code_parser
+from lift_logging import models
 import re
 
 DATE_PREFIX_RE = re.compile(r"^\s*(\d{1,2}/\d{1,2}/\d{2,4})")
@@ -22,7 +21,19 @@ class ParseError(Exception):
         content = f"\n>> {self.line}" if self.line is not None else ""
         return f"{self.args[0]}{loc}{content}"
 
-class Parser:
+
+class ExerciseCodeParser:
+    def normalize(self, exercise_code: str) -> str:
+        # throws if invalid
+        exercise_code = exercise_code.strip()
+        self.validate(exercise_code)
+        return exercise_code # CHTODO
+
+
+    def validate(self, exercise_code: str):
+        pass # CHTODO
+
+class ExerciseLogParser:
     def __init__(self):
         self._state_handlers = {
             'start': self.handle_state_start,
@@ -47,7 +58,7 @@ class Parser:
         
         date = extract_date_prefix(line)
         if date is not None:
-            new_workout = lift_logging.workout.Workout(date, [])
+            new_workout = models.Workout(date, [])
             workouts.append(new_workout)
             return 'inworkout'
 
@@ -66,7 +77,7 @@ class Parser:
         if date is not None:
             if not curr_workout.entries:
                 raise ParseError("No workout entries for previous date", line, None)
-            new_workout = lift_logging.workout.Workout(date, [])
+            new_workout = models.Workout(date, [])
             workouts.append(new_workout)
             return 'inworkout'
         
@@ -81,10 +92,10 @@ class Parser:
         exercise_code = exercise_code.strip()
         set_and_reps_data = set_and_reps_data.strip()
 
-        code_reader = lift_logging.exercise_code_parser.ExerciseCodeParser()
+        code_reader = ExerciseCodeParser()
         normalized_exercise_code = code_reader.normalize(exercise_code)
 
-        curr_workout.entries.append(lift_logging.workout_entry.WorkoutEntry(
+        curr_workout.entries.append(models.WorkoutEntry(
             exercise_code,
             normalized_exercise_code,
             set_and_reps_data
@@ -103,5 +114,4 @@ class Parser:
             return True
 
         return False
-
 

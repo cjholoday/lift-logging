@@ -1,9 +1,9 @@
 
 
-from lift_logging.parser import Parser
-from lift_logging.parser import ParseError
-from lift_logging.workout import Workout
-from lift_logging.workout_entry import WorkoutEntry
+from lift_logging.parsers import ExerciseLogParser
+from lift_logging.parsers import ParseError
+from lift_logging.models import Workout
+from lift_logging.models import WorkoutEntry
 import pytest
 
 def test_basic():

@@ -1,13 +1,13 @@
 
 
-from lift_logging.parser import Parser
-from lift_logging.parser import ParseError
-from lift_logging.workout import Workout
-from lift_logging.workout_entry import WorkoutEntry
+from lift_logging.parsers import ExerciseLogParser
+from lift_logging.parsers import ParseError
+from lift_logging.models.workout import Workout
+from lift_logging.models.workout_entry import WorkoutEntry
 import pytest
 
 def test_basic():
-    parser = Parser()
+    parser = ExerciseLogParser()
     actual_workouts = parser.parse([
         "1/28/26\n",
         "PUm...80#13,6,5...80#2\n",
@@ -35,7 +35,7 @@ def test_basic():
     assert actual_workouts == expected_workouts
 
 def test_two_workouts():
-    parser = Parser()
+    parser = ExerciseLogParser()
     actual_workouts = parser.parse([
         "1/28/26\n",
         "PUm...80#13,6,5...80#2\n",
@@ -61,7 +61,7 @@ def test_two_workouts():
     assert actual_workouts == expected_workouts
 
 def test_whitespace_okay():
-    parser = Parser()
+    parser = ExerciseLogParser()
     actual_workouts = parser.parse([
         "   ",
         "1/28/26\n",
@@ -94,7 +94,7 @@ def test_whitespace_okay():
 
 
 def test_whitespace_okay():
-    parser = Parser()
+    parser = ExerciseLogParser()
     actual_workouts = parser.parse([
         "   ",
         "1/28/26\n",
@@ -126,7 +126,7 @@ def test_whitespace_okay():
     assert actual_workouts == expected_workouts
 
 def test_negative_no_workout_data():
-    parser = Parser()
+    parser = ExerciseLogParser()
 
     with pytest.raises(ParseError):
         parser.parse([
@@ -135,7 +135,7 @@ def test_negative_no_workout_data():
         ])
 
 def test_negative_data_precedes_date():
-    parser = Parser()
+    parser = ExerciseLogParser()
 
     with pytest.raises(ParseError):
         parser.parse([
@@ -144,7 +144,7 @@ def test_negative_data_precedes_date():
         ])
 
 def test_negative_data_precedes_date():
-    parser = Parser()
+    parser = ExerciseLogParser()
 
     with pytest.raises(ParseError):
         parser.parse([
@@ -153,7 +153,7 @@ def test_negative_data_precedes_date():
         ])
 
 def test_negative_invalid_date():
-    parser = Parser()
+    parser = ExerciseLogParser()
 
     with pytest.raises(ParseError):
         parser.parse([
@@ -161,7 +161,7 @@ def test_negative_invalid_date():
         ])
 
 def test_negative_missing_data():
-    parser = Parser()
+    parser = ExerciseLogParser()
 
     with pytest.raises(ParseError):
         parser.parse([

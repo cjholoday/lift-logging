@@ -1,7 +1,7 @@
-import lift_logging.parser
+import lift_logging.parsers
 
 def main():
-    parser = lift_logging.parser.Parser()
+    parser = lift_logging.parsers.ExerciseLogParser()
     workouts = parser.parse([
         "1/28/26\n",
         "PUm...80#13,6,5...80#2\n",

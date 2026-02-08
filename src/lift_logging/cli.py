@@ -1,20 +1,27 @@
 import lift_logging.parsers
+import lift_logging.csv
+
+
+import sys
+
 
 def main():
-    parser = lift_logging.parsers.ExerciseLogParser()
-    workouts = parser.parse([
-        "1/28/26\n",
-        "PUm...80#13,6,5...80#2\n",
-        "... difficult\n",
-        "HAc...5.5#11L,11R,8L,8R\n",
-        "DLk...18#15,10\n",
-        "... comment",
-        "BRbt...35#17,11\n",
-        "BCd...15#13,4\n",
-        "... rushed\n",
-    ])
+    if len(sys.argv) < 2:
+        print("Usage: python -m lift_logging.cli LOGFILE")
+        sys.exit(1)
 
-    print(workouts)
+    exercise_log_path = sys.argv[1]
+
+    with open(exercise_log_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    parser = lift_logging.parsers.ExerciseLogParser()
+    workouts = parser.parse(lines)
+
+    printer = lift_logging.csv.CSVPrinter()
+    output = printer.print(workouts)
+    for line in output:
+        print(line.rstrip())
 
 if __name__ == "__main__":
     main()

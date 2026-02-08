@@ -17,9 +17,9 @@ class ParseError(Exception):
         self.line = line
 
     def __str__(self):
-        loc = f" (line {self.line_no})" if self.line_no is not None else ""
-        content = f"\n>> {self.line}" if self.line is not None else ""
-        return f"{self.args[0]}{loc}{content}"
+        loc = f"Error occured on line {self.line_no}" if self.line_no is not None else ""
+        content = f"Line Content:\n{self.line}" if self.line is not None else ""
+        return f"{self.args[0]}\n{loc}\n{content}"
 
 
 class ExerciseCodeParser:
@@ -35,7 +35,7 @@ class ExerciseCodeParser:
         m = EXERCISE_CODE_RE.fullmatch(exercise_code)
         if not m:
             raise ParseError(
-                "Exercise code does not match expected format. Expected format: EEEvvv$$$ where EEE is the exercise being done in uppercase, vvv is the variation done in lowercase, and $$$ are optional symbols further distinguishing variation", None, None)
+                "Exercise code '{}' does not match expected format. Expected format: EEEvvv$$$ where EEE is the exercise being done in uppercase, vvv is the variation done in lowercase, and $$$ are optional symbols further distinguishing variation".format(exercise_code), None, None)
         return m.group("upper"), m.group("lower"), m.group("symbols")
 
 class ExerciseLogParser:
@@ -110,11 +110,10 @@ class ExerciseLogParser:
             set_and_reps_data
         ))
         
-        print(curr_workout.entries[-1])
         return 'inworkout'
     
     def is_comment_or_empty(self, line):
-        if line.startswith('...'):
+        if line.lstrip().startswith('...'):
             # Ignore the line. It's a comment
             return True
         

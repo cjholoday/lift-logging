@@ -174,3 +174,18 @@ def test_negative_missing_data():
             "1/28/26\n",
             "PUm...\n",
         ])
+def test_indented_comment():
+    parser = ExerciseLogParser()
+
+    actual_workouts = parser.parse([
+        "1/28/26\n",
+        "PUm...80#13,6,5...80#2\n",
+        "   ... PR?\n",
+    ])
+
+    expected_workouts = [
+        Workout('1/28/26', [
+            WorkoutEntry('PUm', 'PUm', '80#13,6,5...80#2'),
+        ])
+    ]
+    assert actual_workouts == expected_workouts
